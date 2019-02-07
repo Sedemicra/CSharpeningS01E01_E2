@@ -60,10 +60,29 @@ namespace CSharpeningS01E01_E2
             // Informing user about the unzipping location in case a relative path was used.
             Console.WriteLine($"Will unzip to: {extractPath}");
             Console.WriteLine("Unzipping...");
-            ZipFile.ExtractToDirectory(zipFile, extractPath);
-            Console.WriteLine("Unzipping process complete.");
+            bool unzipStatus;
+            try
+            {
+                ZipFile.ExtractToDirectory(zipFile, extractPath);
+                Console.WriteLine("Unzipping process complete.");
+                unzipStatus = true;
+            }
+            // The sheer amount of possible different exceptions makes no sense to specially handle in the context of this exercise.
+            catch (Exception ex)
+            {
+                unzipStatus = false;
+                Console.WriteLine($"Something went wrong when attempting to unzip: {ex.Message}");
+            }
             
-            CompressionRatio(zipFile, extractPath);
+            // Compression ratio calculation needs unzipping to be successful
+            if (unzipStatus)
+            {
+                CompressionRatio(zipFile, extractPath);
+            }
+            else
+            {
+                Console.WriteLine("Due to failure in unzipping unable to claculate compression rate.");
+            }
                          
             OldestFileAgeInArchive(zipFile);
 
@@ -106,7 +125,7 @@ namespace CSharpeningS01E01_E2
             // For simplicity sake handle all issues of getting archive size in one general catch.
             catch (Exception ex)
             {
-                Console.WriteLine($"Something went wrong when attempting to retrieve compressed file size: {ex}");
+                Console.WriteLine($"Something went wrong when attempting to retrieve compressed file size: {ex.Message}");
                 return;
             }
                         
@@ -121,7 +140,7 @@ namespace CSharpeningS01E01_E2
             // For simplicity sake handle all issues of getting unziped files sizes in one general catch.
             catch (Exception ex)
             {
-                Console.WriteLine($"Something went wrong when attempting to retrieve unpacked files size: {ex}");
+                Console.WriteLine($"Something went wrong when attempting to retrieve unpacked files size: {ex.Message}");
                 return;
             }
 
@@ -154,7 +173,7 @@ namespace CSharpeningS01E01_E2
             // Very general handling of exceptions as this is not relevant within the scope of current task.
             catch (Exception ex)
             {
-                Console.WriteLine($"Was unable to determine oldest file age: {ex}");
+                Console.WriteLine($"Was unable to determine oldest file age: {ex.Message}");
                 return;
             }
             Console.WriteLine($"The oldest file (by last modified date) was last modified {oldestFileAge} days ago.");
